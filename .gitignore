@@ -1,0 +1,10 @@
+/.calva
+/checkouts
+*.class
+/classes
+/.cpcache/
+*.jar
+/.nrepl-port
+pom.xml
+pom.xml.asc
+/target
