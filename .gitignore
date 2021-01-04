@@ -2,8 +2,10 @@
 /checkouts
 *.class
 /classes
+.clj-kondo/
 /.cpcache/
 *.jar
+.lsp/
 /.nrepl-port
 pom.xml
 pom.xml.asc
