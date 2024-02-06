@@ -1,27 +1,30 @@
-{:deps {clj-config/clj-config {:git/url "https://gitlab.com/orangefoxcollective/clj-config.git"
-                               :sha "7ab17158fec395986abed66d1be5e570da091925"}
-        org.clojure/tools.deps.alpha {:mvn/version "0.9.857"}
-        org.clojure/clojure {:mvn/version "1.10.1"}}
+{;; Dependencies
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}}
 
- :paths ["src"]
+ ;; File system paths
+ :paths ["src" "resources"]
 
- :aliases {:ancient   {:main-opts  ["-m" "deps-ancient.deps-ancient"]
-                       :extra-deps {deps-ancient/deps-ancient {:mvn/version "0.0.5"}}}
+ ;; clj cli aliases
+ :aliases
+ {;; See build.clj for details of the :build alias.
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.6"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
+          :ns-default build}
+  
+  ;; Run tests: clj -X:test
+  :test {:extra-paths ["test"]
+         :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}
+                      io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+         :exec-fn cognitect.test-runner.api/test}
+  
+  ;; Run main ns (args as list): clj -M:run-m
+  :run-m {:main-opts ["-m" "clj-project.core"]}
 
-           :deploy {:extra-deps {slipset/deps-deploy {:mvn/version "0.1.3"}}
-                    :main-opts ["-m" "deps-deploy.deps-deploy" "deploy"
-                                "target/clj-project-0.1.0-standalone.jar"]}
-
-           :test {:extra-paths ["test"]
-                  :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
-                                                          :sha "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}
-                  :main-opts ["-m" "cognitect.test-runner"]}
-
-           :uberjar
-           {:extra-deps
-            {luchiniatwork/cambada {:mvn/version "1.0.5"}}
-            :main-opts ["-m" "cambada.uberjar"
-                        "-m" "clj_project/core"
-                        "--app-version" "0.1.0"]}}
-
- :config {:myvar "myvalue"}}
+  ;; Exec -main (args as key value map): clj -X:run-x
+  :run-x {:ns-default clj-project.core
+          :exec-fn -main
+          :exec-args {:key1 "Clojure"}}
+  
+  ;; Upgrade outdated deps: clj -M:outdated :upgrade true
+  :outdated {:deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}
+             :main-opts ["-m" "antq.core"]}}}
