@@ -21,7 +21,7 @@
 
 (def project
   "Project Metadata"
-  {:description "A library of functions to enhance clojure.core."
+  {:description "A template for starting a clj deps/tools based project."
    :lib 'com.github.wdhowe/clj-project
    :main 'clj-project.core
    :version "1.0.0"
