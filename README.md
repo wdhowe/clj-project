@@ -16,8 +16,8 @@ Batteries included features:
 - CI/CD: Github Workflow that runs tests and packages.
 - Dependencies: Dependency version checks with 'antq'.
 - Tests: Clojure 'test-runner' from Cognitect.
-- Packaging: Create jars with 'clojure.tools.build'.
-- Deploy: Publish jars to clojars via 'deps-deploy'.
+- Packaging: Create jars/uberjars with 'clojure.tools.build'.
+- Deploy: Publish jars/uberjars to clojars via 'deps-deploy'.
 
 ## Execute the -main function
 
@@ -59,10 +59,22 @@ clj -T:build test
 
 ## Packaging
 
-Test, write pom, and build the JAR.
+Test, write pom, and build a JAR.
 
 ```clojure
-clj -T:build ci
+clj -T:build jar
+```
+
+Test, write pom, and build a uberJAR.
+
+```clojure
+clj -T:build uberjar
+```
+
+Clean packaging area.
+
+```clojure
+clj -T:build clean
 ```
 
 ## Deploy
