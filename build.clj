@@ -108,7 +108,8 @@
     (b/copy-dir {:src-dirs ["resources" "src"]
                  :target-dir (:class-dir project)})
     (println "\nBuilding JAR" (:jar-file opts) "...")
-    (b/jar opts))
+    (b/jar opts)
+    (println (format "Created %s" (:jar-file opts))))
   opts)
 
 (defn uberjar
@@ -125,7 +126,8 @@
     (println (str "\nCompiling " (:main project) "..."))
     (b/compile-clj opts)
     (println "\nBuilding UberJAR...")
-    (b/uber opts))
+    (b/uber opts)
+    (println (format "Created %s" (:uber-file opts))))
   opts)
 
 (defn deploy
