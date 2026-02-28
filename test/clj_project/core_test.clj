@@ -5,3 +5,7 @@
 (deftest -main-test
   (testing "Fixme, I ALWAYS pass."
     (is (= true true))))
+
+(deftest ^:integration example-integration-test
+  (testing "Example integration test that should pass."
+    (is (= 1 1))))

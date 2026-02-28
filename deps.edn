@@ -1,22 +1,21 @@
-{;; Dependencies
- :deps {org.clojure/clojure {:mvn/version "1.11.1"}}
-
- ;; File system paths
+{;; File system paths
  :paths ["src" "resources"]
 
- ;; clj cli aliases
+ ;; Dependencies
+ :deps {;; Core
+        org.clojure/clojure {:mvn/version "1.12.4"} ; language
+        }
+
+ ;; Clojure CLI aliases (clj)
  :aliases
- {;; See build.clj for details of the :build alias.
-  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.6"}
-                 slipset/deps-deploy {:mvn/version "0.2.2"}}
-          :ns-default build}
-  
-  ;; Run tests: clj -X:test
-  :test {:extra-paths ["test"]
-         :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}
-                      io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
-         :exec-fn cognitect.test-runner.api/test}
-  
+ {;;; Development ;;;
+
+  ;; Development REPL with nREPL for Calva/VSCode
+  :dev {:extra-paths ["dev"]
+        :extra-deps {nrepl/nrepl {:mvn/version "1.6.0"}
+                     cider/cider-nrepl {:mvn/version "0.58.0"}
+                     criterium/criterium {:mvn/version "0.4.6"}}}
+
   ;; Run main ns (args as list): clj -M:run-m
   :run-m {:main-opts ["-m" "clj-project.core"]}
 
@@ -24,7 +23,53 @@
   :run-x {:ns-default clj-project.core
           :exec-fn -main
           :exec-args {:key1 "Clojure"}}
-  
-  ;; Upgrade outdated deps: clj -M:outdated :upgrade true
+
+  ;;; Quality ;;;
+
+  ;; Lint code: clj -M:lint src/ test/
+  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2026.01.19"}}
+         :main-opts ["-m" "clj-kondo.main" "--lint"]}
+
+  ;; Format code: clj -M:cljfmt fix src/ test/
+  ;; Check format: clj -M:cljfmt check src/ test/
+  :cljfmt {:extra-deps {dev.weavejester/cljfmt {:mvn/version "0.16.0"}}
+           :main-opts ["-m" "cljfmt.main"]}
+
+  ;; Run tests: clj -X:test OR clj -M:test
+  ;; Excludes integration tests by default.
+  :test {:extra-paths ["test"]
+         :extra-deps {org.clojure/test.check {:mvn/version "1.1.3"}
+                      io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+         ;; For clj -X:test
+         :exec-fn cognitect.test-runner.api/test
+         :exec-args {:excludes [:integration]}
+         ;; For clj -M:test
+         :main-opts ["-m" "cognitect.test-runner" "-e" ":integration"]}
+
+  ;; Run tests matching pattern: clj -X:test-m :p <pattern>
+  ;; Example: clj -X:test-m :p core
+  :test-m {:extra-paths ["test" "dev"]
+           :extra-deps {org.clojure/test.check {:mvn/version "1.1.3"}
+                        io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+           :exec-fn test-runner/match}
+
+  ;; Run integration tests: clj -X:test-integration
+  :test-integration {:extra-paths ["test"]
+                     :extra-deps {org.clojure/test.check {:mvn/version "1.1.3"}
+                                  io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+                     :exec-fn cognitect.test-runner.api/test
+                     :exec-args {:includes [:integration]}}
+
+  ;;; Build ;;;
+
+  ;; Build tasks: clj -T:build <task>, eg: clj -T:build ci (see build.clj for tasks)
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.12"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
+          :ns-default build}
+
+  ;;; Maintenance ;;;
+
+  ;; Check for outdated deps: clj -M:outdated
+  ;; Upgrade outdated deps: clj -M:outdated --upgrade
   :outdated {:deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}
              :main-opts ["-m" "antq.core"]}}}

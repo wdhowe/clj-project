@@ -2,6 +2,9 @@
   (:gen-class))
 
 (defn -main
-  "The -main function."
+  "Application entry point.
+
+   Args:
+     args: Command line arguments."
   [& args]
   (println "Hello world. My args are: " args))
