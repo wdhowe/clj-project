@@ -1,0 +1,26 @@
+# Build artifacts
+target/
+classes/
+*.jar
+*.class
+
+# Clojure/IDE caches
+.cpcache/
+.clj-kondo/
+.lsp/
+.calva/
+.nrepl-port
+.nrepl-history
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Dev/test (not needed in build)
+dev/
+test/
+Taskfile.yml

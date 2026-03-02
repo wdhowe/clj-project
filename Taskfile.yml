@@ -9,6 +9,7 @@ version: "3"
 # Prerequisites:
 #   - clojure: Clojure CLI tools (https://clojure.org/guides/install_clojure)
 #   - java: Java 11+ runtime
+#   - docker: For building container images (optional)
 #   - task: Task runner (https://taskfile.dev)
 #
 # Quick Start:
@@ -26,9 +27,14 @@ silent: true
 
 vars:
   # Project Configuration
+  PROJECT_GROUP: com.github.wdhowe
   PROJECT_NAME: clj-project
   PROJECT_VERSION:
     sh: git describe --tags --match 'v*' --always 2>/dev/null | sed 's/^v//' || cat resources/VERSION
+
+  # Docker Configuration
+  DOCKER_IMAGE: "wdhowe/{{.PROJECT_NAME}}"
+  DOCKER_TAG: "{{.PROJECT_VERSION}}"
 
 # ============================================================================
 # Tasks
@@ -197,7 +203,7 @@ tasks:
       - echo "Building uberjar..."
       - clojure -T:build uber
       - echo ""
-      - 'echo "✓ Build complete: target/{{.PROJECT_NAME}}-{{.PROJECT_VERSION}}.jar"'
+      - 'echo "✓ Build complete: target/{{.PROJECT_GROUP}}/{{.PROJECT_NAME}}-{{.PROJECT_VERSION}}.jar"'
     preconditions:
       - sh: command -v clojure
         msg: "Clojure CLI is not installed. See: https://clojure.org/guides/install_clojure"
@@ -212,6 +218,45 @@ tasks:
     preconditions:
       - sh: command -v clojure
         msg: "Clojure CLI is not installed. See: https://clojure.org/guides/install_clojure"
+
+  # --------------------------------------------------------------------------
+  # Docker
+  # --------------------------------------------------------------------------
+
+  docker:build:
+    desc: Build Docker image
+    cmds:
+      - echo "Building Docker image..."
+      - 'echo "  Image: {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}"'
+      - "echo"
+      - >-
+        docker build
+        --build-arg VERSION={{.PROJECT_VERSION}}
+        --build-arg COMMIT_SHA=$(git rev-parse HEAD)
+        --build-arg BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+        --build-arg BUILD_NUMBER={{.PROJECT_VERSION}}
+        -t {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} .
+      - "docker tag {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} {{.DOCKER_IMAGE}}:latest"
+      - "echo"
+      - 'echo "✓ Docker image built: {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}"'
+    preconditions:
+      - sh: command -v docker
+        msg: "Docker is not installed"
+      - sh: test -f Dockerfile
+        msg: "Dockerfile not found in current directory"
+
+  docker:run:
+    desc: Run the Docker container locally
+    cmds:
+      - echo "Starting My Clojure App container..."
+      - "echo"
+      #- "docker run --rm -p 8080:8080 {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}"
+      - "docker run --rm {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} '{{.CLI_ARGS}}'"
+    preconditions:
+      - sh: command -v docker
+        msg: "Docker is not installed"
+      - sh: "docker image inspect {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} > /dev/null 2>&1"
+        msg: "Docker image '{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}' not found. Run 'task docker:build' first"
 
   # --------------------------------------------------------------------------
   # Maintenance
