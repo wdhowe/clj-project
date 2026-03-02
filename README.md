@@ -1,7 +1,7 @@
 # clj-project
 
 <!-- Uncomment after editing links at the bottom of this page
-[![Build Status][gh-actions-badge]][gh-actions] [![Clojars Project][clojars-badge]][clojars] [![Clojure Docs][cljdoc-badge]][cljdoc-link] [![Clojure version][clojure-v]](project.clj)
+[![Build Status][gh-actions-badge]][gh-actions] [![Clojars Project][clojars-badge]][clojars] [![Clojure Docs][cljdoc-badge]][cljdoc-link] [![Clojure version][clojure-v]](deps.edn)
 /-->
 
 A template for starting a clj tools based project.
@@ -13,13 +13,17 @@ Batteries included features:
 - Project dirs/file basics
   - src and test directory structure.
   - .gitignore, build.clj, deps.edn, LICENSE, README.
-- CI/CD: Github Workflow that runs tests and packages.
-- Dependencies: Dependency version checks with 'antq'.
+- Tasks: Taskfile for common development tasks.
+- Dev: REPL with nREPL and cider-nrepl for Calva/VSCode.
+- Quality: Linting with 'clj-kondo', formatting with 'cljfmt'.
 - Tests: Clojure 'test-runner' from Cognitect.
+- Dependencies: Dependency version checks with 'antq'.
 - Packaging: Create jars/uberjars with 'clojure.tools.build'.
 - Deploy: Publish jars/uberjars to clojars via 'deps-deploy'.
+- Docker: Dockerfile for containerized builds.
+- CI/CD: Github Workflow that runs tests and packages.
 
-## Execute the -main function
+## Usage
 
 Run the -main function in the namespace/core.clj file:
 
@@ -35,7 +39,81 @@ clj -M:run-m
 clj -X:run-x
 ```
 
-## Dependencies
+## Tasks
+
+A [Taskfile](https://taskfile.dev) is provided as a convenience wrapper around
+the clj commands documented below.
+
+List all available tasks:
+
+```sh
+task
+```
+
+Examples:
+
+```sh
+task test           # Run tests
+task build          # Build uberjar
+task lint           # Lint code
+task fmt            # Format code
+task docker:build   # Build Docker image
+task outdated       # Check for outdated deps
+```
+
+## Development
+
+Start a dev REPL with nREPL for Calva/VSCode:
+
+```clojure
+clj -M:dev
+```
+
+Lint code:
+
+```clojure
+clj -M:lint src/ test/
+```
+
+Check formatting:
+
+```clojure
+clj -M:cljfmt check src/ test/
+```
+
+Fix formatting:
+
+```clojure
+clj -M:cljfmt fix src/ test/
+```
+
+## Tests
+
+Run tests (excludes integration and strict tests):
+
+```clojure
+clj -M:test
+```
+
+Run tests matching a pattern:
+
+```clojure
+clj -X:test-m :p core
+```
+
+Run integration tests:
+
+```clojure
+clj -X:test-integration
+```
+
+Run all tests via build (no exclusions):
+
+```clojure
+clj -T:build test
+```
+
+## Dependency Maintenance
 
 Check for outdated dependencies:
 
@@ -46,15 +124,7 @@ clj -M:outdated
 Upgrade outdated dependencies.
 
 ```clojure
-clj -M:outdated :upgrade true
-```
-
-## Tests
-
-Run tests:
-
-```clojure
-clj -T:build test
+clj -M:outdated --upgrade
 ```
 
 ## Packaging
@@ -65,10 +135,16 @@ Test, write pom, and build a JAR.
 clj -T:build jar
 ```
 
+Build a uberJAR.
+
+```clojure
+clj -T:build uber
+```
+
 Test, write pom, and build a uberJAR.
 
 ```clojure
-clj -T:build uberjar
+clj -T:build ci
 ```
 
 Clean packaging area.
@@ -95,6 +171,6 @@ clj -T:build deploy
 [gh-actions]: https://github.com/wdhowe/clj-project/actions
 [cljdoc-badge]: https://cljdoc.org/badge/com.github.wdhowe/clj-project
 [cljdoc-link]: https://cljdoc.org/d/com.github.wdhowe/clj-project/CURRENT
-[clojure-v]: https://img.shields.io/badge/clojure-1.11.1-blue.svg
+[clojure-v]: https://img.shields.io/badge/clojure-1.12.4-blue.svg
 [clojars]: https://clojars.org/com.github.wdhowe/clj-project
 [clojars-badge]: https://img.shields.io/clojars/v/com.github.wdhowe/clj-project.svg
