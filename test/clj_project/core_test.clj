@@ -4,6 +4,7 @@
 
 (deftest -main-test
   (testing "Fixme, I ALWAYS pass."
+    (core/-main "arg1" "arg2")
     (is (= true true))))
 
 (deftest ^:integration example-integration-test
