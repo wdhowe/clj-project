@@ -4,12 +4,21 @@
 
 (defn match
   "Run tests matching pattern substring.
-   Usage: clj -X:test-m :p reflection
 
-   Parameters:
-   - opts - map with :p (pattern substring to match)
+   Usage:
+     clj -X:test-m :p reflection
+     clj -X:test-m :p reflection :includes '[:strict]'
 
-   Returns test results."
-  [{:keys [p]}]
-  (tr/test {:patterns [(str ".*" p ".*")]
-            :excludes [:integration]}))
+   Args:
+     opts: Map with :p (pattern substring to match).
+           Optional :includes/:excludes to override defaults.
+
+   Returns:
+     Test results."
+  [{:keys [p] :as opts}]
+  (let [test-opts (dissoc opts :p)
+        defaults (when-not (:includes test-opts)
+                   {:excludes [:integration :strict]})]
+    (tr/test (merge defaults
+                    test-opts
+                    {:patterns [(str ".*" p ".*")]}))))
