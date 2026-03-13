@@ -11,6 +11,12 @@
             [clojure.test :refer [deftest is testing]])
   (:import [java.io PrintWriter StringWriter]))
 
+(def ^:private project-namespaces
+  "All project namespaces to check for reflection warnings.
+   Include core (which loads its dependencies via :reload-all)
+   and any other namespaces not reached transitively via core."
+  '[clj-project.core])
+
 (defn- collect-reflection-warnings
   "Reload all namespaces with *warn-on-reflection* and capture warnings.
 
@@ -19,11 +25,8 @@
   (let [warnings (StringWriter.)]
     (binding [*warn-on-reflection* true
               *err* (PrintWriter. warnings)]
-      ;; Reload all namespaces included via core.clj to trigger reflection warnings
-      (require 'clj-project.core :reload-all)
-      ;; Conditionally-loaded namespaces not reached via core
-      ;(require 'clj-project.other-ns :reload-all)
-      )
+      (doseq [ns-sym project-namespaces]
+        (require ns-sym :reload-all)))
     (str warnings)))
 
 (def ^:private own-ns-prefix

@@ -5,14 +5,17 @@
    Test:
    clj -T:build test
 
-   Test, Write POM, Build JAR:
+   Build JAR:
    clj -T:build jar
 
    Build UberJAR:
    clj -T:build uber
 
+   Test, Write POM, Build JAR:
+   clj -T:build ci-jar
+
    Test, Write POM, Build UberJAR:
-   clj -T:build ci
+   clj -T:build ci-uber
 
    Deploy to Clojars:
    CLOJARS_USERNAME=username
@@ -138,8 +141,28 @@
     (when-not (zero? exit) (throw (ex-info "Tests failed" {}))))
   opts)
 
+(defn- build-jar
+  "Build JAR from resolved opts.
+
+   Copies source and packages.
+
+   Args:
+     opts: Resolved jar-opts map.
+
+   Returns:
+     opts."
+  [opts]
+  (println (str "Version: " version))
+  (println "Copying source...")
+  (b/copy-dir {:src-dirs (into (:resource-dirs project) (:src-dirs project))
+               :target-dir (:class-dir project)})
+  (println (str "Building JAR... " (:jar-file opts)))
+  (b/jar opts)
+  (println (format "Created %s" (:jar-file opts)))
+  opts)
+
 (defn jar
-  "Run the CI pipeline of tests, write pom, and build the JAR.
+  "Build the JAR.
 
    Args:
      opts: Build options map.
@@ -147,18 +170,8 @@
    Returns:
      opts."
   [opts]
-  (test opts)
   (clean opts)
-  (let [opts (jar-opts opts)]
-    (println "\nWriting pom.xml...")
-    (b/write-pom opts)
-    (println "\nCopying source...")
-    (b/copy-dir {:src-dirs (into (:resource-dirs project) (:src-dirs project))
-                 :target-dir (:class-dir project)})
-    (println "\nBuilding JAR" (:jar-file opts) "...")
-    (b/jar opts)
-    (println (format "Created %s" (:jar-file opts))))
-  opts)
+  (build-jar (jar-opts opts)))
 
 (defn- build-uberjar
   "Build uberjar from resolved opts.
@@ -195,7 +208,23 @@
   (clean opts)
   (build-uberjar (uber-opts opts)))
 
-(defn ci
+(defn ci-jar
+  "Run the CI pipeline of tests, write pom, and build the JAR.
+
+   Args:
+     opts: Build options map.
+
+   Returns:
+     opts."
+  [opts]
+  (test opts)
+  (clean opts)
+  (let [opts (jar-opts opts)]
+    (println "Writing pom.xml...")
+    (b/write-pom opts)
+    (build-jar opts)))
+
+(defn ci-uber
   "Run the CI pipeline of tests, write pom, and build the uberjar.
 
    Args:

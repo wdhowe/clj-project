@@ -14,7 +14,8 @@ version: "3"
 #
 # Quick Start:
 #   task test        # Run tests
-#   task build       # Build uberjar
+#   task build:uber  # Build uberjar
+#   task build:jar   # Build JAR
 #
 # ============================================================================
 
@@ -196,7 +197,7 @@ tasks:
       - sh: command -v clojure
         msg: "Clojure CLI is not installed. See: https://clojure.org/guides/install_clojure"
 
-  build:
+  build:uber:
     desc: Build the production uberjar
     cmds:
       - echo "Building uberjar..."
@@ -207,13 +208,35 @@ tasks:
       - sh: command -v clojure
         msg: "Clojure CLI is not installed. See: https://clojure.org/guides/install_clojure"
 
-  ci:
-    desc: Run full CI pipeline (test + build)
+  build:jar:
+    desc: Build the JAR
     cmds:
-      - echo "Running CI pipeline..."
-      - clojure -T:build ci
+      - echo "Building JAR..."
+      - clojure -T:build jar
       - echo ""
-      - echo "✓ CI pipeline complete"
+      - 'echo "✓ Build complete: target/{{.PROJECT_GROUP}}/{{.PROJECT_NAME}}-{{.PROJECT_VERSION}}.jar"'
+    preconditions:
+      - sh: command -v clojure
+        msg: "Clojure CLI is not installed. See: https://clojure.org/guides/install_clojure"
+
+  ci:jar:
+    desc: Run CI pipeline for JAR (test + pom + jar)
+    cmds:
+      - echo "Running CI pipeline (test + pom + jar)..."
+      - clojure -T:build ci-jar
+      - echo ""
+      - echo "✓ CI JAR pipeline complete"
+    preconditions:
+      - sh: command -v clojure
+        msg: "Clojure CLI is not installed. See: https://clojure.org/guides/install_clojure"
+
+  ci:uber:
+    desc: Run CI pipeline for uberjar (test + pom + uberjar)
+    cmds:
+      - echo "Running CI pipeline (test + pom + uberjar)..."
+      - clojure -T:build ci-uber
+      - echo ""
+      - echo "✓ CI uberjar pipeline complete"
     preconditions:
       - sh: command -v clojure
         msg: "Clojure CLI is not installed. See: https://clojure.org/guides/install_clojure"
