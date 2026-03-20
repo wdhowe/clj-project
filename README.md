@@ -23,6 +23,18 @@ Batteries included features:
 - Docker: Dockerfile for containerized builds.
 - CI/CD: Github Workflow that runs tests and packages.
 
+## Getting Started
+
+After cloning this template, rename the project to your own:
+
+```sh
+./scripts/rename-project.sh my-new-project my-github-user "My Name"
+```
+
+This replaces all references to the current project name, GitHub username,
+and author in source files, configs, and directory names. The GitHub username
+and author are optional.
+
 ## Usage
 
 Run the -main function in the namespace/core.clj file:
@@ -129,22 +141,28 @@ clj -M:outdated --upgrade
 
 ## Packaging
 
-Test, write pom, and build a JAR.
+Build a JAR.
 
 ```clojure
 clj -T:build jar
 ```
 
-Build a uberJAR.
+Build an uberJAR.
 
 ```clojure
 clj -T:build uber
 ```
 
-Test, write pom, and build a uberJAR.
+Test, write pom, and build a JAR.
 
 ```clojure
-clj -T:build ci
+clj -T:build ci-jar
+```
+
+Test, write pom, and build an uberJAR.
+
+```clojure
+clj -T:build ci-uber
 ```
 
 Clean packaging area.
